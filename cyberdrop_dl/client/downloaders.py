@@ -135,7 +135,7 @@ class Downloader:
                     if complete_file.exists():
                         total_size = await session.get_filesize(url, referer, current_throttle)
                         if complete_file.stat().st_size == total_size:
-                            await self.SQL_helper.sql_insert_file(db_path, complete_file.name, str(url), 1)
+                            await self.SQL_helper.sql_insert_file(db_path, complete_file.name, str(referral), 1)
                             logger.debug("\nFile already exists and matches expected size: " + str(complete_file))
                             await self.File_Lock.remove_lock(original_filename)
                             return
@@ -154,10 +154,10 @@ class Downloader:
                     else:
                         filename = download_name
 
-                await self.SQL_helper.sql_insert_file(db_path, filename, str(url), 0)
+                await self.SQL_helper.sql_insert_file(db_path, filename, str(referral), 0)
 
                 if self.mark_downloaded:
-                    await self.SQL_helper.sql_update_file(db_path, filename, str(url), 1)
+                    await self.SQL_helper.sql_update_file(db_path, filename, str(referral), 1)
                     return
 
                 complete_file = (self.folder / self.title / filename)
@@ -217,7 +217,7 @@ class Downloader:
         else:
             temp_file.rename(complete_file)
 
-        await self.SQL_helper.sql_update_file(db_path, filename, str(url), 1)
+        await self.SQL_helper.sql_update_file(db_path, filename, str(referral), 1)
         if url.parts[-1] in self.current_attempt.keys():
             self.current_attempt.pop(url.parts[-1])
         logger.debug("Finished " + filename)
