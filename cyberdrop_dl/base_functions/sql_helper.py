@@ -26,6 +26,7 @@ class SQLHelper:
         create_table_query = """CREATE TABLE IF NOT EXISTS downloads (
                                             path TEXT,
                                             downloaded_filename TEXT,
+                                            url TEXT,
                                             completed INTEGER NOT NULL,
                                             PRIMARY KEY (path)
                                         );"""
@@ -58,7 +59,7 @@ class SQLHelper:
             self.conn.commit()
 
     async def check_columns(self):
-        self.curs.execute("""SELECT COUNT(*) AS CNTREC FROM pragma_table_info('downloads') WHERE 
+        self.curs.execute("""SELECT COUNT(*) AS CNTREC FROM pragma_table_info('downloads') WHERE
                              name='path'""")
         sql_check = self.curs.fetchone()[0]
         if sql_check == (0):
@@ -67,6 +68,7 @@ class SQLHelper:
             create_table_query = """CREATE TABLE IF NOT EXISTS downloads (
                                     path TEXT,
                                     downloaded_filename TEXT,
+                                    url TEXT,
                                     completed INTEGER NOT NULL,
                                     PRIMARY KEY (path)
                                 );"""
@@ -84,12 +86,12 @@ class SQLHelper:
         self.curs.execute("""INSERT OR IGNORE INTO downloads_temp VALUES (?)""", (downloaded_filename,))
         self.conn.commit()
 
-    async def sql_insert_file(self, path, downloaded_filename, completed):
-        self.curs.execute("""INSERT OR IGNORE INTO downloads VALUES (?, ?, ?)""", (path, downloaded_filename, completed, ))
+    async def sql_insert_file(self, path, downloaded_filename, url, completed):
+        self.curs.execute("""INSERT OR IGNORE INTO downloads VALUES (?, ?, ?, ?)""", (path, downloaded_filename, url, completed, ))
         self.conn.commit()
 
-    async def sql_update_file(self, path, downloaded_filename, completed):
-        self.curs.execute("""INSERT OR REPLACE INTO downloads VALUES (?, ?, ?)""", (path, downloaded_filename, completed, ))
+    async def sql_update_file(self, path, downloaded_filename, url, completed):
+        self.curs.execute("""INSERT OR REPLACE INTO downloads VALUES (?, ?, ?, ?)""", (path, downloaded_filename, url, completed, ))
         self.conn.commit()
 
     async def check_filename(self, filename):
