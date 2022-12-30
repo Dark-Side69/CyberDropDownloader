@@ -182,7 +182,7 @@ class Downloader:
                                             temp_file, resume_point, show_progress, self.File_Lock, self.folder,
                                             self.title, self.proxy, headers)
 
-            await self.rename_file(filename, url, db_path)
+            await self.rename_file(filename, url, referer, db_path)
             await self.File_Lock.remove_lock(original_filename)
 
         except (aiohttp.client_exceptions.ClientPayloadError, aiohttp.client_exceptions.ClientOSError,
@@ -207,7 +207,7 @@ class Downloader:
             else:
                 raise FailureException(code=1, message=e)
 
-    async def rename_file(self, filename: str, url: URL, db_path: str) -> None:
+    async def rename_file(self, filename: str, url: URL, referrer :URL, db_path: str) -> None:
         """Rename complete file."""
         complete_file = (self.folder / self.title / filename)
         temp_file = complete_file.with_suffix(complete_file.suffix + '.part')
@@ -217,7 +217,7 @@ class Downloader:
         else:
             temp_file.rename(complete_file)
 
-        await self.SQL_helper.sql_update_file(db_path, filename, str(referral), 1)
+        await self.SQL_helper.sql_update_file(db_path, filename, str(referrer), 1)
         if url.parts[-1] in self.current_attempt.keys():
             self.current_attempt.pop(url.parts[-1])
         logger.debug("Finished " + filename)
