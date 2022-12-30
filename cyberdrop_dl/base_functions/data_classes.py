@@ -26,6 +26,7 @@ class AlbumItem:
     title: str
     link_pairs: List[Tuple]
     password: Optional[str] = None
+    foldername: Optional[str] = None
 
     async def add_link_pair(self, link, referral):
         self.link_pairs.append((link, referral))
@@ -79,6 +80,17 @@ class DomainItem:
             new_albums[new_title] = album
             album.title = new_title
         self.albums = new_albums
+
+    async def append_foldername(self, foldername):
+        if not foldername:
+            return
+        new_albums = {}
+        for album_str, album in self.albums.items():
+            folderName = foldername+'/'+album_str
+            new_albums[folderName] = album
+            album.foldername = folderName
+        self.albums = new_albums
+
 
 
 @dataclass

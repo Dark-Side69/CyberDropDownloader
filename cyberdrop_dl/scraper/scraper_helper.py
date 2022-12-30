@@ -103,17 +103,19 @@ class ScrapeMapper:
                         "rule34.xxx": self.Rule34, "saint.to": self.Saint,  "socialmediagirls": self.SocialMediaGirls,
                         "simpcity": self.SimpCity, "xbunker": self.XBunker}
 
-    async def Anonfiles(self, url: URL, title=None):
+    async def Anonfiles(self, url: URL, title=None, foldername=None):
         anonfiles_session = Session(self.client)
         if not self.anonfiles_crawler:
             self.anonfiles_crawler = AnonfilesCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.anonfiles_crawler.fetch(anonfiles_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await anonfiles_session.exit_handler()
 
-    async def Bunkr(self, url: URL, title=None):
+    async def Bunkr(self, url: URL, title=None, foldername=None):
         bunkr_session = Session(self.client)
         if not self.bunkr_crawler:
             self.bunkr_crawler = BunkrCrawler(include_id=self.include_id, quiet=self.quiet)
@@ -121,20 +123,24 @@ class ScrapeMapper:
             domain_obj = await self.bunkr_crawler.fetch(bunkr_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await bunkr_session.exit_handler()
 
-    async def Cyberdrop(self, url: URL, title=None):
+    async def Cyberdrop(self, url: URL, title=None, foldername=None):
         cyberdrop_session = Session(self.client)
         if not self.cyberdrop_crawler:
             self.cyberdrop_crawler = CyberdropCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.cyberdrop_crawler.fetch(cyberdrop_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await cyberdrop_session.exit_handler()
 
-    async def Coomer(self, url: URL, title=None):
+    async def Coomer(self, url: URL, title=None, foldername=None):
         coomer_session = Session(self.client)
         if not self.coomer_crawler:
             self.coomer_crawler = CoomerCrawler(include_id=self.include_id, scraping_mapper=self,
@@ -142,10 +148,12 @@ class ScrapeMapper:
         domain_obj = await self.coomer_crawler.fetch(coomer_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await coomer_session.exit_handler()
 
-    async def Cyberfile(self, url: URL, title=None):
+    async def Cyberfile(self, url: URL, title=None, foldername=None):
         cyberfile_session = Session(self.client)
         if not self.cyberfile_crawler:
             self.cyberfile_crawler = CyberfileCrawler(quiet=self.quiet)
@@ -153,30 +161,36 @@ class ScrapeMapper:
             domain_obj = await self.cyberfile_crawler.fetch(cyberfile_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await cyberfile_session.exit_handler()
 
-    async def Erome(self, url: URL, title=None):
+    async def Erome(self, url: URL, title=None, foldername=None):
         erome_session = Session(self.client)
         if not self.erome_crawler:
             self.erome_crawler = EromeCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.erome_crawler.fetch(erome_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await erome_session.exit_handler()
 
-    async def Fapello(self, url: URL, title=None):
+    async def Fapello(self, url: URL, title=None, foldername=None):
         fapello_session = Session(self.client)
         if not self.fapello_crawler:
             self.fapello_crawler = FapelloCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.fapello_crawler.fetch(fapello_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await fapello_session.exit_handler()
 
-    async def GoFile(self, url: URL, title=None):
+    async def GoFile(self, url: URL, title=None, foldername=None):
         gofile_session = Session(self.client)
         if not self.gofile_crawler:
             try:
@@ -188,30 +202,36 @@ class ScrapeMapper:
         domain_obj = await self.gofile_crawler.fetch(gofile_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await gofile_session.exit_handler()
 
-    async def HGameCG(self, url: URL, title=None):
+    async def HGameCG(self, url: URL, title=None, foldername=None):
         hgamecg_session = Session(self.client)
         if not self.hgamecg_crawler:
             self.hgamecg_crawler = HGameCGCrawler(quiet=self.quiet)
         domain_obj = await self.hgamecg_crawler.fetch(hgamecg_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await hgamecg_session.exit_handler()
 
-    async def ImgBox(self, url: URL, title=None):
+    async def ImgBox(self, url: URL, title=None, foldername=None):
         imgbox_session = Session(self.client)
         if not self.imgbox_crawler:
             self.imgbox_crawler = ImgBoxCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.imgbox_crawler.fetch(imgbox_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await imgbox_session.exit_handler()
 
-    async def Kemono(self, url: URL, title=None):
+    async def Kemono(self, url: URL, title=None, foldername=None):
         kemono_session = Session(self.client)
         if not self.kemono_crawler:
             self.kemono_crawler = KemonoCrawler(include_id=self.include_id, scraping_mapper=self,
@@ -219,10 +239,12 @@ class ScrapeMapper:
         domain_obj = await self.kemono_crawler.fetch(kemono_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await kemono_session.exit_handler()
 
-    async def Gfycat(self, url: URL, title=None):
+    async def Gfycat(self, url: URL, title=None, foldername=None):
         gfycat_session = Session(self.client)
         if not self.gfycat_crawler:
             self.gfycat_crawler = GfycatCrawler(quiet=self.quiet)
@@ -234,27 +256,31 @@ class ScrapeMapper:
                 await self.Cascade.add_to_album("gfycat.com", "gifs", content_url, url)
         await gfycat_session.exit_handler()
 
-    async def Pixeldrain(self, url: URL, title=None):
+    async def Pixeldrain(self, url: URL, title=None, foldername=None):
         pixeldrain_session = Session(self.client)
         if not self.pixeldrain_crawler:
             self.pixeldrain_crawler = PixelDrainCrawler(quiet=self.quiet)
         domain_obj = await self.pixeldrain_crawler.fetch(pixeldrain_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await pixeldrain_session.exit_handler()
 
-    async def Postimg(self, url: URL, title=None):
+    async def Postimg(self, url: URL, title=None, foldername=None):
         postimg_session = Session(self.client)
         if not self.postimg_crawler:
             self.postimg_crawler = PostImgCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.postimg_crawler.fetch(postimg_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await postimg_session.exit_handler()
 
-    async def Redgifs(self, url: URL, title=None):
+    async def Redgifs(self, url: URL, title=None, foldername=None):
         redgifs_session = Session(self.client)
         if not self.redgifs_crawler:
             self.redgifs_crawler = RedGifsCrawler(quiet=self.quiet)
@@ -266,29 +292,33 @@ class ScrapeMapper:
                 await self.Cascade.add_to_album("redgifs.com", "gifs", content_url, url)
         await redgifs_session.exit_handler()
 
-    async def Rule34(self, url: URL, title=None):
+    async def Rule34(self, url: URL, title=None, foldername=None):
         rule34_session = Session(self.client)
         if not self.rule34_crawler:
             self.rule34_crawler = Rule34Crawler(quiet=self.quiet)
         domain_obj = await self.rule34_crawler.fetch(rule34_session, url)
-        
+
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
-            
+
         await rule34_session.exit_handler()
 
-    async def Saint(self, url: URL, title=None):
+    async def Saint(self, url: URL, title=None, foldername=None):
         saint_session = Session(self.client)
         if not self.saint_crawler:
             self.saint_crawler = SaintCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.saint_crawler.fetch(saint_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await saint_session.exit_handler()
 
-    async def ShareX(self, url: URL, title=None):
+    async def ShareX(self, url: URL, title=None, foldername=None):
         sharex_session = Session(self.client)
         if not self.sharex_crawler:
             self.sharex_crawler = ShareXCrawler(include_id=self.include_id, quiet=self.quiet)
@@ -300,11 +330,13 @@ class ScrapeMapper:
             domain_obj = await self.sharex_crawler.fetch(sharex_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
 
         await self.Cascade.add_albums(domain_obj)
         await sharex_session.exit_handler()
 
-    async def SocialMediaGirls(self, url: URL, title=None):
+    async def SocialMediaGirls(self, url: URL, title=None, foldername=None):
         socialmediagirls_session = Session(self.client)
         if not self.socialmediagirls_crawler:
             self.socialmediagirls_crawler = SocialMediaGirlsCrawler(include_id=self.include_id,
@@ -316,7 +348,7 @@ class ScrapeMapper:
             await self.Cascade.extend(await self.socialmediagirls_crawler.fetch(socialmediagirls_session, url))
         await socialmediagirls_session.exit_handler()
 
-    async def SimpCity(self, url: URL, title=None):
+    async def SimpCity(self, url: URL, title=None, foldername=None):
         simpcity_session = Session(self.client)
         if not self.simpcity_crawler:
             self.simpcity_crawler = SimpCityCrawler(include_id=self.include_id, auth=self.simpcity_auth,
@@ -326,7 +358,7 @@ class ScrapeMapper:
             await self.Cascade.extend(await self.simpcity_crawler.fetch(simpcity_session, url))
         await simpcity_session.exit_handler()
 
-    async def XBunker(self, url: URL, title=None):
+    async def XBunker(self, url: URL, title=None, foldername=None):
         xbunker_session = Session(self.client)
         if not self.xbunker_crawler:
             self.xbunker_crawler = XBunkerCrawler(include_id=self.include_id, auth=self.xbunker_auth,
@@ -336,13 +368,15 @@ class ScrapeMapper:
             await self.Cascade.extend(await self.xbunker_crawler.fetch(xbunker_session, url))
         await xbunker_session.exit_handler()
 
-    async def XBunkr(self, url: URL, title=None):
+    async def XBunkr(self, url: URL, title=None, foldername=None):
         xbunkr_session = Session(self.client)
         if not self.xbunkr_crawler:
             self.xbunkr_crawler = XBunkrCrawler(include_id=self.include_id, quiet=self.quiet)
         domain_obj = await self.xbunkr_crawler.fetch(xbunkr_session, url)
         if title:
             await domain_obj.append_title(title)
+        if foldername:
+            await domain_obj.append_foldername(foldername)
         await self.Cascade.add_albums(domain_obj)
         await xbunkr_session.exit_handler()
 
@@ -363,7 +397,7 @@ class ScrapeMapper:
             crawler = None
 
 
-    async def map_url(self, url_to_map: URL, title=None):
+    async def map_url(self, url_to_map: URL, title=None, foldername=None):
         if not url_to_map:
             return
         elif not url_to_map.host:
@@ -374,7 +408,7 @@ class ScrapeMapper:
                 if any(site in key for site in self.skip_data.sites):
                     await log("Skipping scrape of " + str(url_to_map), quiet=self.quiet)
                 else:
-                    await value(url=url_to_map, title=title)
+                    await value(url=url_to_map, title=title, foldername=foldername)
                 return
 
         if self.jdownloader_enable:

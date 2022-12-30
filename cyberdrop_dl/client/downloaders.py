@@ -79,10 +79,12 @@ def retry(f):
 class Downloader:
     def __init__(self, album_obj: AlbumItem, title: str, max_workers: int, excludes: Dict[str, bool],
                  SQL_helper: SQLHelper, client: Client, file_args: Dict, runtime_args: Dict, pixeldrain_api_key: str,
-                 scraper: ScrapeMapper):
+                 scraper: ScrapeMapper, foldername: str = None):
         self.album_obj = album_obj
         self.client = client
         self.folder = file_args['output_folder']
+        if foldername:
+            self.folder = self.folder / foldername
         self.title = title
 
         self.SQL_helper = SQL_helper

@@ -5,6 +5,7 @@ from .scraper_helper import ScrapeMapper
 from ..base_functions.base_functions import log
 from ..base_functions.data_classes import AuthData, SkipData
 from ..client.client import Client
+from yarl import URL
 
 
 async def scrape(urls, client: Client, file_args: Dict, jdownloader_args: Dict, runtime_args: Dict,
@@ -18,7 +19,12 @@ async def scrape(urls, client: Client, file_args: Dict, jdownloader_args: Dict, 
                            jdownloader_auth=jdownloader_auth, skip_data=skip_data, quiet=quiet)
     tasks = []
     for link in urls:
-        tasks.append(scraper.map_url(link))
+        url = URL(link['url'])
+        if(len(link) == 1):
+            foldername = None
+        else:
+            foldername = link['foldername']
+        tasks.append(scraper.map_url(url_to_map=url, foldername=foldername))
     await asyncio.gather(*tasks)
 
     if close:

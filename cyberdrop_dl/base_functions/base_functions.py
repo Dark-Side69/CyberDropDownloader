@@ -86,18 +86,31 @@ async def purge_dir(dirname, in_place=True):
         list(map(os.rmdir, deleted))
 
 
+
 async def regex_links(urls) -> list:
-    yarl_links = []
+    links = []
     for line in urls:
         if line.lstrip().startswith('#'):
             continue
 
         all_links = [x.group().replace(".md.", ".") for x in re.finditer(
-            r"(?:http.*?)(?=($|\n|\r\n|\r|\s|\"|\[/URL]|]\[|\[/img]))", line)]
-        for link in all_links:
-            yarl_links.append(URL(link))
-    return yarl_links
+            r"(?:http.*?)(?=($|\n|\r\n|\r|\s|\"|\[/URL]|]\[|\[/img]))|(.+?~.+)", line)]
 
+        if len(all_links) == 2:
+            # Extract the foldername from the captured text
+            foldername = all_links[1].split("~")[1] if "~" in all_links[1] else None
+            # trim foldername to 100 characters
+            foldername = foldername[:MAX_FILENAME_LENGTH] if foldername else None
+            # remove anything after # foldername
+            foldername = foldername.split("#")[0] if foldername else None
+            # remove any illegal characters from the foldername
+            foldername = await sanitize(foldername) if foldername else None
+            link_obj = {'url': all_links[0], 'foldername': foldername}
+        else:
+            link_obj = {'url': all_links[0]}
+
+        links.append(link_obj)
+    return links
 
 async def cyberdrop_parse(url: URL) -> URL:
     mapping_direct = [r'img-...cyberdrop...',
