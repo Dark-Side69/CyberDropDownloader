@@ -8,11 +8,12 @@ from random import gauss
 import aiofiles
 import aiofiles.os
 import aiohttp.client_exceptions
+from colorama import Fore
 from tqdm import tqdm
 from yarl import URL
 
 from ..base_functions.base_functions import FILE_FORMATS, MAX_FILENAME_LENGTH, log, logger, sanitize, FailureException, \
-    is_forum
+    is_forum, check_free_space
 from ..base_functions.sql_helper import SQLHelper
 from ..base_functions.data_classes import AlbumItem, CascadeItem, FileLock
 from ..client.client import Client, DownloadSession
@@ -66,13 +67,7 @@ def retry(f):
                         args = list(args)
                         args[0] = args[0].with_host('img-01.cyberdrop.to')
                         args = tuple(args)
-                    else:
-                        args = list(args)
-                        args[0] = URL(str(args[0]).replace('fs-05.', 'fs-04.'))
-                        args = tuple(args)
-
                 await asyncio.sleep(2)
-
     return wrapper
 
 
@@ -114,6 +109,10 @@ class Downloader:
     async def download_file(self, url: URL, referral: URL, filename: str, session: DownloadSession, db_path: str,
                             show_progress: bool = True) -> None:
         """Download the content of given URL"""
+        if not await check_free_space(self.runtime_args['required_free_space'], self.file_args['output_folder']):
+            await log("Not enough free space to download file, skipping.", quiet=True)
+            return
+
         if url.parts[-1] not in self.current_attempt:
             self.current_attempt[url.parts[-1]] = 0
 
@@ -137,7 +136,7 @@ class Downloader:
                     if complete_file.exists():
                         total_size = await session.get_filesize(url, referer, current_throttle)
                         if complete_file.stat().st_size == total_size:
-                            await self.SQL_helper.sql_insert_file(db_path, complete_file.name, str(referral), 1)
+                            await self.SQL_helper.sql_insert_file(db_path, complete_file.name, 1, referer)
                             logger.debug("\nFile already exists and matches expected size: " + str(complete_file))
                             await self.File_Lock.remove_lock(original_filename)
                             return
@@ -156,10 +155,10 @@ class Downloader:
                     else:
                         filename = download_name
 
-                await self.SQL_helper.sql_insert_file(db_path, filename, str(referral), 0)
+                await self.SQL_helper.sql_insert_file(db_path, filename, 0, referer)
 
                 if self.mark_downloaded:
-                    await self.SQL_helper.sql_update_file(db_path, filename, str(referral), 1)
+                    await self.SQL_helper.sql_update_file(db_path, filename, 1, referer)
                     return
 
                 complete_file = (self.folder / self.title / filename)
@@ -184,7 +183,7 @@ class Downloader:
                                             temp_file, resume_point, show_progress, self.File_Lock, self.folder,
                                             self.title, self.proxy, headers)
 
-            await self.rename_file(filename, url, referer, db_path)
+            await self.rename_file(filename, url, db_path, referer)
             await self.File_Lock.remove_lock(original_filename)
 
         except (aiohttp.client_exceptions.ClientPayloadError, aiohttp.client_exceptions.ClientOSError,
@@ -209,7 +208,7 @@ class Downloader:
             else:
                 raise FailureException(code=1, message=e)
 
-    async def rename_file(self, filename: str, url: URL, referrer :URL, db_path: str) -> None:
+    async def rename_file(self, filename: str, url: URL, db_path: str, referer: str) -> None:
         """Rename complete file."""
         complete_file = (self.folder / self.title / filename)
         temp_file = complete_file.with_suffix(complete_file.suffix + '.part')
@@ -219,7 +218,7 @@ class Downloader:
         else:
             temp_file.rename(complete_file)
 
-        await self.SQL_helper.sql_update_file(db_path, filename, str(referrer), 1)
+        await self.SQL_helper.sql_update_file(db_path, filename, 1, referer)
         if url.parts[-1] in self.current_attempt.keys():
             self.current_attempt.pop(url.parts[-1])
         logger.debug("Finished " + filename)
@@ -348,6 +347,9 @@ class Downloader:
     async def download_content(self, show_progress: bool = True, conn_timeout: int = 15) -> None:
         """Download the content of all links and save them as files."""
         session = DownloadSession(self.client, conn_timeout)
+        if not await check_free_space(self.runtime_args['required_free_space'], self.file_args['output_folder']):
+            await log("Not enough free space to run the program.", Fore.RED)
+            exit(0)
         coros = [self.download_and_store(url_object, session, show_progress)
                  for url_object in self.album_obj.link_pairs]
         for func in tqdm(asyncio.as_completed(coros), total=len(coros), desc=self.title, unit='FILE'):

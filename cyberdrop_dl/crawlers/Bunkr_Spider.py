@@ -55,11 +55,15 @@ class BunkrCrawler:
                 if ext in FILE_FORMATS['Videos']:
                     cdn_loc = file['cdn']
                     media_loc = cdn_loc.replace('cdn', 'media-files')
+                    if "12" in media_loc:
+                        media_loc = media_loc.replace('.ru', '.la')
                     referrer = "https://stream.bunkr.ru/v/" + file['name']
                     link = URL(media_loc + '/' + file['name'])
                 elif ext in FILE_FORMATS['Other']:
                     cdn_loc = file['cdn']
                     media_loc = cdn_loc.replace('cdn', 'media-files')
+                    if "12" in media_loc:
+                        media_loc = media_loc.replace('.ru', '.la')
                     referrer = "https://files.bunkr.ru/d/" + file['name']
                     link = URL(media_loc + '/' + file['name'])
                 else:
