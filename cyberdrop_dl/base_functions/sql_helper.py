@@ -26,7 +26,6 @@ class SQLHelper:
         create_table_query = """CREATE TABLE IF NOT EXISTS downloads (
                                             path TEXT,
                                             downloaded_filename TEXT,
-                                            url TEXT,
                                             completed INTEGER NOT NULL,
                                             PRIMARY KEY (path)
                                         );"""
@@ -78,42 +77,49 @@ class SQLHelper:
         self.curs.execute("""PRAGMA table_info('downloads')""")
         sql_check = self.curs.fetchall()
         sql_check = list(sum(sql_check, ()))
-        columns = {'path': "TEXT", 'downloaded_filename': "TEXT", 'completed': "INTEGER NOT NULL", 'referrer': "TEXT"}
+        columns = {'path': "TEXT", 'downloaded_filename': "TEXT",
+                   'completed': "INTEGER NOT NULL", 'referrer': "TEXT"}
         for column in columns.keys():
             if column in sql_check:
                 continue
             else:
-                query = "ALTER TABLE downloads ADD COLUMN {} {}".format(column, columns[column])
+                query = "ALTER TABLE downloads ADD COLUMN {} {}".format(
+                    column, columns[column])
                 self.curs.execute(query)
                 self.conn.commit()
-
 
     async def sql_check_existing(self, path):
         if self.ignore_history:
             return False
-        self.curs.execute("""SELECT completed FROM downloads WHERE path = ?""", (path, ))
+        self.curs.execute(
+            """SELECT completed FROM downloads WHERE path = ?""", (path, ))
         sql_file_check = self.curs.fetchone()
         return sql_file_check and sql_file_check[0] == 1
 
     async def sql_insert_temp(self, downloaded_filename):
-        self.curs.execute("""INSERT OR IGNORE INTO downloads_temp VALUES (?)""", (downloaded_filename,))
+        self.curs.execute(
+            """INSERT OR IGNORE INTO downloads_temp VALUES (?)""", (downloaded_filename,))
         self.conn.commit()
 
     async def sql_insert_file(self, path, downloaded_filename, completed, referrer):
-        self.curs.execute("""INSERT OR IGNORE INTO downloads VALUES (?, ?, ?, ?)""", (path, downloaded_filename, completed, referrer, ))
+        self.curs.execute("""INSERT OR IGNORE INTO downloads VALUES (?, ?, ?, ?)""",
+                          (path, downloaded_filename, completed, referrer, ))
         self.conn.commit()
 
     async def sql_update_file(self, path, downloaded_filename, completed, referrer):
-        self.curs.execute("""INSERT OR REPLACE INTO downloads VALUES (?, ?, ?, ?)""", (path, downloaded_filename, completed, referrer, ))
+        self.curs.execute("""INSERT OR REPLACE INTO downloads VALUES (?, ?, ?, ?)""",
+                          (path, downloaded_filename, completed, referrer, ))
         self.conn.commit()
 
     async def check_filename(self, filename):
-        self.curs.execute("""SELECT EXISTS(SELECT 1 FROM downloads WHERE downloaded_filename = ?)""", (filename, ))
+        self.curs.execute(
+            """SELECT EXISTS(SELECT 1 FROM downloads WHERE downloaded_filename = ?)""", (filename, ))
         sql_check = self.curs.fetchone()[0]
         return sql_check == 1
 
     async def get_download_filename(self, path):
-        self.curs.execute("""SELECT downloaded_filename FROM downloads WHERE path = ?""", (path, ))
+        self.curs.execute(
+            """SELECT downloaded_filename FROM downloads WHERE path = ?""", (path, ))
         filename = self.curs.fetchone()
         if filename:
             return filename[0]
@@ -130,6 +136,7 @@ class SQLHelper:
             self.conn.commit()
             self.conn.close()
         except Exception as e:
-            logging.debug(f"Failed to close sqlite database connection: {str(e)}")
+            logging.debug(
+                f"Failed to close sqlite database connection: {str(e)}")
         else:
             logging.debug("Successfully closed sqlite database connection")
